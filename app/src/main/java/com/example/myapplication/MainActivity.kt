@@ -8,6 +8,10 @@ import android.widget.TextView
 import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
+
+    var myPassword = "dbsm";
+    var isValid = false;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -15,8 +19,29 @@ class MainActivity : AppCompatActivity() {
         var password = findViewById<EditText>(R.id.txtPassword);
         var button = findViewById<Button>(R.id.btnSubmit);
 
+
         button.setOnClickListener() {
-            Toast.makeText(this, password.text, Toast.LENGTH_SHORT).show()
+            var inputPassword = password.text.toString();
+
+            if (inputPassword.isEmpty()) {
+                Toast.makeText(this,"You have to enter password.", Toast.LENGTH_SHORT).show();
+            } else {
+                isValid = validate(inputPassword);
+
+                if(!isValid) {
+                    Toast.makeText(this,"Incorrect password.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(this,"Login succesful.", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
+    }
+
+    fun validate(password : String) : Boolean {
+        if(password.equals(myPassword)) {
+            return true;
+        }
+        return false;
     }
 }
