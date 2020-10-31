@@ -1,7 +1,10 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -33,6 +36,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 else {
                     Toast.makeText(this,"Login succesful.", Toast.LENGTH_SHORT).show();
+                    // Add the code to go to new activity
+                    setContentView(R.layout.activity_home_page);
+                    println("Nadal w main activity");
+                    val intent = Intent(this, HomePageActivity::class.java);
+                    startActivity(intent);
                 }
             }
         }
