@@ -28,40 +28,49 @@ class HomePageActivity : AppCompatActivity() {
         val saveNotesButton = findViewById<Button>(R.id.btnSaveMessage);
         val loadNotesButton = findViewById<Button>(R.id.btnLoadMessage);
 
+        loadNote(notes, storageFile);
+
         saveNotesButton.setOnClickListener(View.OnClickListener {
-            val data:String = notes.text.toString();
-            val fileOutputStream:FileOutputStream;
-            try {
-                fileOutputStream = openFileOutput(storageFile, Context.MODE_PRIVATE);
-                fileOutputStream.write(data.toByteArray());
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace();
-            } catch (e: NumberFormatException) {
-                e.printStackTrace();
-            } catch (e: IOException) {
-                e.printStackTrace();
-            } catch (e: Exception) {
-                e.printStackTrace();
-            }
-            println("Note save niby się wykonuje");
-            Toast.makeText(this, "note save", Toast.LENGTH_LONG).show();
+            saveNote(notes, storageFile);
         })
 
         loadNotesButton.setOnClickListener(View.OnClickListener {
-            if(storageFile.trim() != "") {
-                var fileInputStream: FileInputStream? = null;
-                fileInputStream = openFileInput(storageFile)
-                var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream)
-                val bufferedReader: BufferedReader = BufferedReader(inputStreamReader)
-                val stringBuilder: StringBuilder = StringBuilder()
-                var text: String? = null
-                while ({ text = bufferedReader.readLine(); text }() != null) {
-                    stringBuilder.append(text)
-                }
-                notes.setText(stringBuilder.toString()).toString();
-            } else {
-                Toast.makeText(this,"file name cannot be blank",Toast.LENGTH_LONG).show();
-            }
+            loadNote(notes, storageFile);
         })
+    }
+
+    fun saveNote(notes: EditText, fileName : String) {
+        val data:String = notes.text.toString();
+        val fileOutputStream:FileOutputStream;
+        try {
+            fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+            fileOutputStream.write(data.toByteArray());
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace();
+        } catch (e: NumberFormatException) {
+            e.printStackTrace();
+        } catch (e: IOException) {
+            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace();
+        }
+        Toast.makeText(this, "note save", Toast.LENGTH_LONG).show();
+    }
+
+    fun loadNote(notes: EditText, fileName: String) {
+        if(fileName.trim() != "") {
+            var fileInputStream: FileInputStream? = null;
+            fileInputStream = openFileInput(fileName)
+            var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream)
+            val bufferedReader: BufferedReader = BufferedReader(inputStreamReader)
+            val stringBuilder: StringBuilder = StringBuilder()
+            var text: String? = null
+            while ({ text = bufferedReader.readLine(); text }() != null) {
+                stringBuilder.append(text)
+            }
+            notes.setText(stringBuilder.toString()).toString();
+        } else {
+            Toast.makeText(this,"file name cannot be blank",Toast.LENGTH_LONG).show();
+        }
     }
 }
