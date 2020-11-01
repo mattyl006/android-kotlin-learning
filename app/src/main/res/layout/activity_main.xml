@@ -11,6 +11,8 @@
         android:id="@+id/lblPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/lblPassword"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
@@ -19,7 +21,8 @@
         android:id="@+id/txtPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword" >
+        android:inputType="textPassword"
+        android:layout_marginBottom="16dp">
         <requestFocus />
     </EditText>
 

@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 else {
                     Toast.makeText(this,"Login succesful.", Toast.LENGTH_SHORT).show();
-                    // Add the code to go to new activity
 
                     val intent = Intent(this, HomePageActivity::class.java);
                     startActivity(intent);
@@ -59,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         }
         return false;
     }
-
 
     fun loadPassword() : String {
         val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);

@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -27,6 +29,9 @@ class HomePageActivity : AppCompatActivity() {
 
         val notes = findViewById<EditText>(R.id.txtNotes);
         val notesStorage = "notesStorage.txt";
+
+        notes.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        notes.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         val saveNotesButton = findViewById<Button>(R.id.btnSaveMessage);
         val loadNotesButton = findViewById<Button>(R.id.btnLoadMessage);

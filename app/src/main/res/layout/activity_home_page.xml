@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:layout_marginTop="16dp"
         android:id="@+id/lblMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,7 +20,8 @@
         android:id="@+id/txtNotes"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:inputType="text"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
         tools:ignore="LabelFor"
         android:autofillHints="type your message" />
 
@@ -33,12 +35,14 @@
         android:id="@+id/btnLoadMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="@string/btn_load" />
 
     <TextView
         android:id="@+id/lblChangePassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="@string/lblChangePassword"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -48,12 +52,14 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:autofillHints="type new password"
+        android:layout_marginBottom="8dp"
         tools:ignore="LabelFor" />
 
     <Button
         android:id="@+id/btnSavePassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="@string/btn_save" />
 
     <Button
