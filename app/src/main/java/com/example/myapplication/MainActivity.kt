@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,6 +10,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.lang.NullPointerException
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         var password = findViewById<EditText>(R.id.txtPassword);
         var button = findViewById<Button>(R.id.btnSubmit);
 
+        myPassword = loadPassword();
 
         button.setOnClickListener() {
             var inputPassword = password.text.toString();
@@ -37,8 +45,7 @@ class MainActivity : AppCompatActivity() {
                 else {
                     Toast.makeText(this,"Login succesful.", Toast.LENGTH_SHORT).show();
                     // Add the code to go to new activity
-                    setContentView(R.layout.activity_home_page);
-                    println("Nadal w main activity");
+
                     val intent = Intent(this, HomePageActivity::class.java);
                     startActivity(intent);
                 }
@@ -51,5 +58,12 @@ class MainActivity : AppCompatActivity() {
             return true;
         }
         return false;
+    }
+
+
+    fun loadPassword() : String {
+        val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+        val newPassword = sharedPreference.getString("password", "dbsm");
+        return newPassword.toString();
     }
 }

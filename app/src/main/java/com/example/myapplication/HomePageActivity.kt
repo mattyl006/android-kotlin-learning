@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import java.io.*
 import java.lang.Exception
+import java.lang.NullPointerException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
 
@@ -24,27 +26,46 @@ class HomePageActivity : AppCompatActivity() {
         println("Realizuje się kod home page activity");
 
         val notes = findViewById<EditText>(R.id.txtNotes);
-        val storageFile = "data.txt";
+        val notesStorage = "notesStorage.txt";
+
         val saveNotesButton = findViewById<Button>(R.id.btnSaveMessage);
         val loadNotesButton = findViewById<Button>(R.id.btnLoadMessage);
 
-        loadNote(notes, storageFile);
+        val backButton = findViewById<Button>(R.id.btnBack);
+
+        val changePassword = findViewById<EditText>(R.id.txtPassword);
+        val savePasswordButton = findViewById<Button>(R.id.btnSavePassword);
+
+        loadData(notes, notesStorage);
 
         saveNotesButton.setOnClickListener(View.OnClickListener {
-            saveNote(notes, storageFile);
+            saveData(notes, notesStorage);
         })
 
         loadNotesButton.setOnClickListener(View.OnClickListener {
-            loadNote(notes, storageFile);
+            loadData(notes, notesStorage);
+        })
+
+        savePasswordButton.setOnClickListener(View.OnClickListener {
+            val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+            val editor = sharedPreference.edit();
+            editor.putString("password", changePassword.text.toString());
+            editor.apply();
+        })
+
+        backButton.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this, MainActivity::class.java);
+            startActivity(intent);
         })
     }
 
-    fun saveNote(notes: EditText, fileName : String) {
+    fun saveData(notes: EditText, fileName : String) {
         val data:String = notes.text.toString();
         val fileOutputStream:FileOutputStream;
         try {
             fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
             fileOutputStream.write(data.toByteArray());
+            println("Niby działa");
         } catch (e: FileNotFoundException) {
             e.printStackTrace();
         } catch (e: NumberFormatException) {
@@ -54,23 +75,28 @@ class HomePageActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace();
         }
-        Toast.makeText(this, "note save", Toast.LENGTH_LONG).show();
     }
 
-    fun loadNote(notes: EditText, fileName: String) {
-        if(fileName.trim() != "") {
-            var fileInputStream: FileInputStream? = null;
-            fileInputStream = openFileInput(fileName)
-            var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream)
-            val bufferedReader: BufferedReader = BufferedReader(inputStreamReader)
-            val stringBuilder: StringBuilder = StringBuilder()
-            var text: String? = null
-            while ({ text = bufferedReader.readLine(); text }() != null) {
-                stringBuilder.append(text)
+    fun loadData(notes: EditText, fileName: String) {
+        try {
+            if (fileName.trim() != "") {
+                var fileInputStream: FileInputStream? = null;
+                fileInputStream = openFileInput(fileName)
+                var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream)
+                val bufferedReader: BufferedReader = BufferedReader(inputStreamReader)
+                val stringBuilder: StringBuilder = StringBuilder()
+                var text: String? = null
+                while ({ text = bufferedReader.readLine(); text }() != null) {
+                    stringBuilder.append(text)
+                }
+                notes.setText(stringBuilder.toString()).toString();
+            } else {
+                Toast.makeText(this, "file name cannot be blank", Toast.LENGTH_LONG).show();
             }
-            notes.setText(stringBuilder.toString()).toString();
-        } else {
-            Toast.makeText(this,"file name cannot be blank",Toast.LENGTH_LONG).show();
+        } catch (e : IOException) {
+            println("Failed load data, file not exist.");
+        } catch (e: NullPointerException) {
+            println("Failed load data, file not exist.");
         }
     }
 }
