@@ -18,14 +18,9 @@ import java.lang.StringBuilder
 
 class HomePageActivity : AppCompatActivity() {
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
-
-        println("Realizuje się kod home page activity");
 
         val notes = findViewById<EditText>(R.id.txtNotes);
         val notesStorage = "notesStorage.txt";
@@ -70,7 +65,6 @@ class HomePageActivity : AppCompatActivity() {
         try {
             fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
             fileOutputStream.write(data.toByteArray());
-            println("Niby działa");
         } catch (e: FileNotFoundException) {
             e.printStackTrace();
         } catch (e: NumberFormatException) {
@@ -100,8 +94,19 @@ class HomePageActivity : AppCompatActivity() {
             }
         } catch (e : IOException) {
             println("Failed load data, file not exist.");
+            println("Try save some data first.");
         } catch (e: NullPointerException) {
             println("Failed load data, file not exist.");
+            println("Try save some data first.");
+        } catch (e: Exception) {
+            println("Failed load data, file not exist.");
+            println("Try save some data first.");
+        } catch (e: FileNotFoundException) {
+            println("Failed load data, file not exist.");
+            println("Try save some data first.");
+        } catch (e: NumberFormatException) {
+            println("Failed load data, file not exist.");
+            println("Try save some data first.");
         }
     }
 }
