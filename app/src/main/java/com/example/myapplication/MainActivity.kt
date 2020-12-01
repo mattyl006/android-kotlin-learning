@@ -1,21 +1,18 @@
 package com.example.myapplication
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import java.io.BufferedReader
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStreamReader
-import java.lang.NullPointerException
-import java.lang.StringBuilder
+import androidx.annotation.RequiresApi
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +50,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun validate(password : String) : Boolean {
-        if(password.equals(myPassword)) {
+        val aes = HomePageActivity.ChCrypto;
+        if(password == aes.aesDecrypt(myPassword, "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B")) {
             return true;
         }
         return false;
