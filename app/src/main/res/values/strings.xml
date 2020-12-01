@@ -4,7 +4,7 @@
     <string name="btn_submit">Submit</string>
     <string name="btn_save">Save</string>
     <string name="btn_load">Load</string>
-    <string name="lblMessage">Notes:</string>
+    <string name="lblMessage">Secret Message:</string>
     <string name="lblChangePassword">Change your password:</string>
     <string name="btn_back">Back to main view</string>
 </resources>

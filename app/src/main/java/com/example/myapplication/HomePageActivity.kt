@@ -86,10 +86,21 @@ class HomePageActivity : AppCompatActivity() {
         })
 
         savePasswordButton.setOnClickListener(View.OnClickListener {
-            val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-            val editor = sharedPreference.edit();
-            editor.putString("password", aes.aesEncrypt(changePassword.text.toString(), "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B"));
-            editor.apply();
+            if(changePassword.text.toString().length > 9) {
+                val sharedPreference =
+                    getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+                val editor = sharedPreference.edit();
+                editor.putString(
+                    "password",
+                    aes.aesEncrypt(
+                        changePassword.text.toString(),
+                        "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B"
+                    )
+                );
+                editor.apply();
+            } else {
+                Toast.makeText(this, "Typed password is too short, password minimal length is 10", Toast.LENGTH_LONG).show();
+            }
         })
 
         backButton.setOnClickListener(View.OnClickListener {

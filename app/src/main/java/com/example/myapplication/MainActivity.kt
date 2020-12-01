@@ -2,17 +2,12 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,28 +18,34 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var password = findViewById<EditText>(R.id.txtPassword);
-        var button = findViewById<Button>(R.id.btnSubmit);
+        val password = findViewById<EditText>(R.id.txtPassword);
+        val button = findViewById<Button>(R.id.btnSubmit);
 
         myPassword = loadPassword();
+        var access = true;
 
         button.setOnClickListener() {
-            var inputPassword = password.text.toString();
+            if(access) {
+                val inputPassword = password.text.toString();
+                if (inputPassword.isEmpty()) {
+                    Toast.makeText(this, "You have to enter password.", Toast.LENGTH_SHORT).show();
+                } else {
+                    isValid = validate(inputPassword);
+                    if (!isValid) {
+                        Toast.makeText(this, "Incorrect password.", Toast.LENGTH_SHORT).show();
+                        access = false;
+                    } else {
+                        Toast.makeText(this, "Login succesful.", Toast.LENGTH_SHORT).show();
 
-            if (inputPassword.isEmpty()) {
-                Toast.makeText(this,"You have to enter password.", Toast.LENGTH_SHORT).show();
+                        val intent = Intent(this, HomePageActivity::class.java);
+                        startActivity(intent);
+                    }
+                }
             } else {
-                isValid = validate(inputPassword);
-
-                if(!isValid) {
-                    Toast.makeText(this,"Incorrect password.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(this,"Login succesful.", Toast.LENGTH_SHORT).show();
-
-                    val intent = Intent(this, HomePageActivity::class.java);
-                    startActivity(intent);
-                }
+                Toast.makeText(this, "You must wait some time to try press password again.", Toast.LENGTH_SHORT).show();
+                Handler().postDelayed({
+                    access = true;
+                }, 10000)
             }
         }
     }
