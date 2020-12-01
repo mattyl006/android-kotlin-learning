@@ -147,18 +147,23 @@ class HomePageActivity : AppCompatActivity() {
         } catch (e : IOException) {
             println("Failed load data, file not exist.");
             println("Try save some data first.");
+            Toast.makeText(this, "Failed load data, file not exist. Try save some data first.", Toast.LENGTH_LONG).show();
         } catch (e: NullPointerException) {
             println("Failed load data, file not exist.");
             println("Try save some data first.");
+            Toast.makeText(this, "Failed load data, file not exist. Try save some data first.", Toast.LENGTH_LONG).show();
         } catch (e: Exception) {
             println("Failed load data, file not exist.");
             println("Try save some data first.");
+            Toast.makeText(this, "Failed load data, file not exist. Try save some data first.", Toast.LENGTH_LONG).show();
         } catch (e: FileNotFoundException) {
             println("Failed load data, file not exist.");
             println("Try save some data first.");
+            Toast.makeText(this, "Failed load data, file not exist. Try save some data first.", Toast.LENGTH_LONG).show();
         } catch (e: NumberFormatException) {
             println("Failed load data, file not exist.");
             println("Try save some data first.");
+            Toast.makeText(this, "Failed load data, file not exist. Try save some data first.", Toast.LENGTH_LONG).show();
         }
     }
 
