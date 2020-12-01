@@ -11,7 +11,8 @@ import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    var myPassword = "dbsm";
+    val domainPasswordHashed = "d8vQEBpCRmydByUT+R7Zjg==";
+    var myPassword = domainPasswordHashed;
     var isValid = false;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     fun loadPassword() : String {
         val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-        val newPassword = sharedPreference.getString("password", "dbsm");
+        val newPassword = sharedPreference.getString("password", domainPasswordHashed);
         return newPassword.toString();
     }
 }
