@@ -15,7 +15,7 @@ import java.security.MessageDigest
 class MainActivity : AppCompatActivity() {
 
     var isValid = false;
-    var typedPassword = ""
+    var typedPassword = "";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         try {
             typedPassword = loadPassword();
-        } catch (e : IOException) {
+        } catch (e: IOException) {
             setFirstPass();
         } catch (e: NullPointerException) {
             setFirstPass();
@@ -54,13 +54,17 @@ class MainActivity : AppCompatActivity() {
                         access = false;
                     } else {
                         Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show();
-
                         val intent = Intent(this, HomePageActivity::class.java);
+                        intent.putExtra("correctPassword", inputPassword);
                         startActivity(intent);
                     }
                 }
             } else {
-                Toast.makeText(this, "You must wait some time to try press password again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                    this,
+                    "You must wait some time to try press password again.",
+                    Toast.LENGTH_SHORT
+                ).show();
                 Handler().postDelayed({
                     access = true;
                 }, 10000)
@@ -86,10 +90,11 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent);
     }
 
-    fun hashString(stringToHash : String): String {
+    fun hashString(stringToHash: String): String {
         val messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(stringToHash.toByteArray());
         val stringHashed = String(messageDigest.digest());
         return stringHashed;
     }
+
 }

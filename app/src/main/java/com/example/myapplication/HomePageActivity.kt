@@ -25,6 +25,8 @@ import javax.crypto.spec.SecretKeySpec
 
 class HomePageActivity : AppCompatActivity() {
 
+    var keyFragment = "";
+
     object ChCrypto{
         @RequiresApi(Build.VERSION_CODES.O)
         @JvmStatic fun aesEncrypt(v:String, secretKey:String) = AES256.encrypt(v, secretKey)
@@ -39,7 +41,7 @@ class HomePageActivity : AppCompatActivity() {
         private val decorder = Base64.getDecoder()
         private fun cipher(opmode:Int, secretKey:String):Cipher{
             if(secretKey.length != 32) throw RuntimeException("SecretKey length is not 32 chars")
-            val c = Cipher.getInstance("AES/CBC/PKCS5Padding")
+            val c = Cipher.getInstance("AES/OFB32/PKCS5Padding")
             val sk = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), "AES")
             val iv = IvParameterSpec(secretKey.substring(0, 16).toByteArray(Charsets.UTF_8))
             c.init(opmode, sk, iv)
@@ -61,11 +63,12 @@ class HomePageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
+        keyFragment = intent.getStringExtra("correctPassword").toString();
+
         val notes = findViewById<EditText>(R.id.txtNotes);
         val notesStorage = "notesStorage.txt";
-//        val aes = ChCrypto;
 
-        notes.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        notes.imeOptions = EditorInfo.IME_ACTION_DONE;
         notes.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         val saveNotesButton = findViewById<Button>(R.id.btnSaveMessage);
@@ -90,11 +93,7 @@ class HomePageActivity : AppCompatActivity() {
             if(changePassword.text.toString().length < 16) {
                 Toast.makeText(this, "Typed password is too short, password minimal length is 16", Toast.LENGTH_LONG).show();
             } else {
-                val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-                val editor = sharedPreference.edit();
-                editor.putString("password", hashString(changePassword.text.toString()));
-                editor.apply();
-                Toast.makeText(this, "Typed password successfully changed", Toast.LENGTH_LONG).show();
+                changePassword(changePassword.text.toString(), notes, notesStorage);
             }
         })
 
@@ -105,19 +104,25 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     fun saveData(notes: EditText, fileName : String) {
-        val data:String = notes.text.toString();
+        val aes = ChCrypto;
+        val data:String = aes.aesEncrypt(notes.text.toString(), (keyFragment+keyFragment).substring(0, 32));
         val fileOutputStream:FileOutputStream;
         try {
             fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
             fileOutputStream.write(data.toByteArray());
+            Toast.makeText(this, "Save note success.", Toast.LENGTH_LONG).show();
         } catch (e: FileNotFoundException) {
             e.printStackTrace();
+            println("ERROR: Something went wrong with notes saving.");
         } catch (e: NumberFormatException) {
             e.printStackTrace();
+            println("ERROR: Something went wrong with notes saving.");
         } catch (e: IOException) {
             e.printStackTrace();
+            println("ERROR: Something went wrong with notes saving.");
         } catch (e: Exception) {
             e.printStackTrace();
+            println("ERROR: Something went wrong with notes saving.");
         }
     }
 
@@ -134,7 +139,7 @@ class HomePageActivity : AppCompatActivity() {
                 while ({ text = bufferedReader.readLine(); text }() != null) {
                     stringBuilder.append(text)
                 }
-                notes.setText(stringBuilder.toString()).toString();
+                notes.setText(aes.aesDecrypt(stringBuilder.toString(), (keyFragment+keyFragment).substring(0, 32))).toString();
             } else {
                 Toast.makeText(this, "file name cannot be blank", Toast.LENGTH_LONG).show();
             }
@@ -166,6 +171,34 @@ class HomePageActivity : AppCompatActivity() {
         messageDigest.update(stringToHash.toByteArray());
         val stringHashed = String(messageDigest.digest());
         return stringHashed;
+    }
+
+    fun changePassword(typedPassword : String, notes : EditText, notesStorage : String) {
+        try {
+            val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+            val editor = sharedPreference.edit();
+            editor.putString("password", hashString(typedPassword));
+            editor.apply();
+            loadData(notes, notesStorage);
+            keyFragment = typedPassword;
+            saveData(notes, notesStorage);
+            Toast.makeText(this, "Typed password successfully changed", Toast.LENGTH_LONG).show();
+        } catch (e : IOException) {
+            println("Something went wrong with password changing");
+            Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
+        } catch (e: NullPointerException) {
+            println("Something went wrong with password changing");
+            Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
+        } catch (e: Exception) {
+            println("Something went wrong with password changing");
+            Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
+        } catch (e: FileNotFoundException) {
+            println("Something went wrong with password changing");
+            Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
+        } catch (e: NumberFormatException) {
+            println("Something went wrong with password changing");
+            Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
+        }
     }
 }
 

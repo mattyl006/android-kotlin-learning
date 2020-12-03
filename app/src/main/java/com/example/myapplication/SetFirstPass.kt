@@ -28,6 +28,8 @@ class SetFirstPass : AppCompatActivity() {
                 val editor = sharedPreference.edit();
                 editor.putString("password", hashString(setPassword.text.toString()));
                 editor.apply();
+                Toast.makeText(this, "Setting password success", Toast.LENGTH_LONG).show();
+
             }
         })
 
