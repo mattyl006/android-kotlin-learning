@@ -15,7 +15,7 @@ import java.security.MessageDigest
 class MainActivity : AppCompatActivity() {
 
     var isValid = false;
-    var myPassword = ""
+    var typedPassword = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btnSubmit);
 
         try {
-            myPassword = loadPassword();
+            typedPassword = loadPassword();
         } catch (e : IOException) {
             setFirstPass();
         } catch (e: NullPointerException) {
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             setFirstPass();
         } catch (e: NumberFormatException) {
             setFirstPass();
-        }; if(myPassword == "accident") {
+        }; if(typedPassword == "accident") {
             setFirstPass();
         }
 
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun validate(password: String) : Boolean {
-        if(password == myPassword) {
+        if(hashString(password) == typedPassword) {
             return true;
         }
         return false;
@@ -90,5 +90,12 @@ class MainActivity : AppCompatActivity() {
     fun setFirstPass() {
         val intent = Intent(this, SetFirstPass::class.java);
         startActivity(intent);
+    }
+
+    fun hashString(stringToHash : String): String {
+        val messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(stringToHash.toByteArray());
+        val stringHashed = String(messageDigest.digest());
+        return stringHashed;
     }
 }

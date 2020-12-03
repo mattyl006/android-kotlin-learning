@@ -47,7 +47,6 @@ class SetFirstPass : AppCompatActivity() {
         val messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(stringToHash.toByteArray());
         val stringHashed = String(messageDigest.digest());
-        println("Test hasha: $stringHashed");
         return stringHashed;
     }
 }
