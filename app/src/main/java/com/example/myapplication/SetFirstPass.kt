@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import java.security.MessageDigest
 
 class SetFirstPass : AppCompatActivity() {
 
@@ -25,7 +26,7 @@ class SetFirstPass : AppCompatActivity() {
             } else {
                 val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
                 val editor = sharedPreference.edit();
-                editor.putString("password", setPassword.text.toString());
+                editor.putString("password", hashString(setPassword.text.toString()));
                 editor.apply();
             }
         })
@@ -40,5 +41,13 @@ class SetFirstPass : AppCompatActivity() {
                 startActivity(intent);
             }
         })
+    }
+
+    fun hashString(stringToHash : String): String {
+        val messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(stringToHash.toByteArray());
+        val stringHashed = String(messageDigest.digest());
+        println("Test hasha: $stringHashed");
+        return stringHashed;
     }
 }
