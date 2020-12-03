@@ -2,12 +2,13 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +25,12 @@ class MainActivity : AppCompatActivity() {
 
         myPassword = loadPassword();
         var access = true;
+        
+        val stringToHash = "dbsmHashTest";
+        val messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(stringToHash.toByteArray());
+        val stringHash = String(messageDigest.digest());
+        println("Test hasha: $stringHash");
 
         button.setOnClickListener() {
             if(access) {
@@ -51,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun validate(password : String) : Boolean {
+    fun validate(password: String) : Boolean {
         val aes = HomePageActivity.ChCrypto;
         if(password == aes.aesDecrypt(myPassword, "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B")) {
             return true;
