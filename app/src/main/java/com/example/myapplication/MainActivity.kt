@@ -8,13 +8,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
 
-    val domainPasswordHashed = "d8vQEBpCRmydByUT+R7Zjg==";
-    var myPassword = domainPasswordHashed;
     var isValid = false;
+    var myPassword = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +24,22 @@ class MainActivity : AppCompatActivity() {
         val password = findViewById<EditText>(R.id.txtPassword);
         val button = findViewById<Button>(R.id.btnSubmit);
 
-        myPassword = loadPassword();
+        try {
+            myPassword = loadPassword();
+        } catch (e : IOException) {
+            setFirstPass();
+        } catch (e: NullPointerException) {
+            setFirstPass();
+        } catch (e: Exception) {
+            setFirstPass();
+        } catch (e: FileNotFoundException) {
+            setFirstPass();
+        } catch (e: NumberFormatException) {
+            setFirstPass();
+        }; if(myPassword == "accident") {
+            setFirstPass();
+        }
+
         var access = true;
         
         val stringToHash = "dbsmHashTest";
@@ -59,8 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun validate(password: String) : Boolean {
-        val aes = HomePageActivity.ChCrypto;
-        if(password == aes.aesDecrypt(myPassword, "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B")) {
+        if(password == myPassword) {
             return true;
         }
         return false;
@@ -68,7 +83,12 @@ class MainActivity : AppCompatActivity() {
 
     fun loadPassword() : String {
         val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-        val newPassword = sharedPreference.getString("password", domainPasswordHashed);
+        val newPassword = sharedPreference.getString("password", "accident");
         return newPassword.toString();
+    }
+
+    fun setFirstPass() {
+        val intent = Intent(this, SetFirstPass::class.java);
+        startActivity(intent);
     }
 }

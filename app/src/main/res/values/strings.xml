@@ -6,5 +6,6 @@
     <string name="btn_load">Load</string>
     <string name="lblMessage">Secret Message:</string>
     <string name="lblChangePassword">Change your password:</string>
+    <string name="lblSetPassword">Set your password:</string>
     <string name="btn_back">Back to main view</string>
 </resources>

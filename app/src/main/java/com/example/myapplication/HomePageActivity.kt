@@ -62,7 +62,7 @@ class HomePageActivity : AppCompatActivity() {
 
         val notes = findViewById<EditText>(R.id.txtNotes);
         val notesStorage = "notesStorage.txt";
-        val aes = ChCrypto;
+//        val aes = ChCrypto;
 
         notes.setImeOptions(EditorInfo.IME_ACTION_DONE);
         notes.setRawInputType(InputType.TYPE_CLASS_TEXT);
@@ -90,13 +90,7 @@ class HomePageActivity : AppCompatActivity() {
                 val sharedPreference =
                     getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
                 val editor = sharedPreference.edit();
-                editor.putString(
-                    "password",
-                    aes.aesEncrypt(
-                        changePassword.text.toString(),
-                        "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B"
-                    )
-                );
+                editor.putString("password", changePassword.text.toString());
                 editor.apply();
             } else {
                 Toast.makeText(this, "Typed password is too short, password minimal length is 10", Toast.LENGTH_LONG).show();
@@ -110,8 +104,7 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     fun saveData(notes: EditText, fileName : String) {
-        val aes = ChCrypto;
-        val data:String = aes.aesEncrypt(notes.text.toString(), "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B");
+        val data:String = notes.text.toString();
         val fileOutputStream:FileOutputStream;
         try {
             fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -140,7 +133,7 @@ class HomePageActivity : AppCompatActivity() {
                 while ({ text = bufferedReader.readLine(); text }() != null) {
                     stringBuilder.append(text)
                 }
-                notes.setText(aes.aesDecrypt(stringBuilder.toString(), "n2r5u8x/A?D(G+KbPdSgVkYp3s6v9y&B")).toString();
+                notes.setText(stringBuilder.toString()).toString();
             } else {
                 Toast.makeText(this, "file name cannot be blank", Toast.LENGTH_LONG).show();
             }
