@@ -42,12 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         var access = true;
         
-        val stringToHash = "dbsmHashTest";
-        val messageDigest = MessageDigest.getInstance("SHA-256");
-        messageDigest.update(stringToHash.toByteArray());
-        val stringHash = String(messageDigest.digest());
-        println("Test hasha: $stringHash");
-
         button.setOnClickListener() {
             if(access) {
                 val inputPassword = password.text.toString();
@@ -59,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this, "Incorrect password.", Toast.LENGTH_SHORT).show();
                         access = false;
                     } else {
-                        Toast.makeText(this, "Login succesful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show();
 
                         val intent = Intent(this, HomePageActivity::class.java);
                         startActivity(intent);

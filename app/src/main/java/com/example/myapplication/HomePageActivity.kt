@@ -17,6 +17,7 @@ import java.lang.Exception
 import java.lang.NullPointerException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
+import java.security.MessageDigest
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -86,14 +87,14 @@ class HomePageActivity : AppCompatActivity() {
         })
 
         savePasswordButton.setOnClickListener(View.OnClickListener {
-            if(changePassword.text.toString().length > 9) {
-                val sharedPreference =
-                    getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-                val editor = sharedPreference.edit();
-                editor.putString("password", changePassword.text.toString());
-                editor.apply();
+            if(changePassword.text.toString().length < 16) {
+                Toast.makeText(this, "Typed password is too short, password minimal length is 16", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Typed password is too short, password minimal length is 10", Toast.LENGTH_LONG).show();
+                val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+                val editor = sharedPreference.edit();
+                editor.putString("password", hashString(changePassword.text.toString()));
+                editor.apply();
+                Toast.makeText(this, "Typed password successfully changed", Toast.LENGTH_LONG).show();
             }
         })
 
@@ -160,6 +161,11 @@ class HomePageActivity : AppCompatActivity() {
         }
     }
 
-
+    fun hashString(stringToHash : String): String {
+        val messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(stringToHash.toByteArray());
+        val stringHashed = String(messageDigest.digest());
+        return stringHashed;
+    }
 }
 
