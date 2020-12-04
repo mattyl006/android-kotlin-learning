@@ -40,28 +40,30 @@ class HomePageActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         private val decorder = Base64.getDecoder()
         private fun cipher(opmode:Int, secretKey:String):Cipher{
-            if(secretKey.length != 32) throw RuntimeException("SecretKey length is not 32 chars")
-            val c = Cipher.getInstance("AES/OFB32/PKCS5Padding")
-            val sk = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), "AES")
-            val iv = IvParameterSpec(secretKey.substring(0, 16).toByteArray(Charsets.UTF_8))
-            c.init(opmode, sk, iv)
+            if(secretKey.length != 32) throw RuntimeException("SecretKey length is not 32 chars");
+            val c = Cipher.getInstance("AES/OFB32/PKCS5Padding");
+            val sk = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), "AES");
+            val iv = IvParameterSpec(secretKey.substring(0, 16).toByteArray(Charsets.UTF_8));
+            // Secure random, aby iv był zawsze losowy, zupełnie losowy nie związany z kluczem
+            // IV trzeba bedzie gdzies przechowac i zabezpieczyc, bo przy decrypt bedzie  trzeba uzyc go jeszcze raz
+            c.init(opmode, sk, iv);
             return c
         }
         @RequiresApi(Build.VERSION_CODES.O)
         fun encrypt(str:String, secretKey:String):String{
-            val encrypted = cipher(Cipher.ENCRYPT_MODE, secretKey).doFinal(str.toByteArray(Charsets.UTF_8))
-            return String(encorder.encode(encrypted))
+            val encrypted = cipher(Cipher.ENCRYPT_MODE, secretKey).doFinal(str.toByteArray(Charsets.UTF_8));
+            return String(encorder.encode(encrypted));
         }
         @RequiresApi(Build.VERSION_CODES.O)
         fun decrypt(str:String, secretKey:String):String{
-            val byteStr = decorder.decode(str.toByteArray(Charsets.UTF_8))
-            return String(cipher(Cipher.DECRYPT_MODE, secretKey).doFinal(byteStr))
+            val byteStr = decorder.decode(str.toByteArray(Charsets.UTF_8));
+            return String(cipher(Cipher.DECRYPT_MODE, secretKey).doFinal(byteStr));
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_page)
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home_page);
 
         keyFragment = intent.getStringExtra("correctPassword").toString();
 
@@ -106,6 +108,7 @@ class HomePageActivity : AppCompatActivity() {
     fun saveData(notes: EditText, fileName : String) {
         val aes = ChCrypto;
         val data:String = aes.aesEncrypt(notes.text.toString(), (keyFragment+keyFragment).substring(0, 32));
+        // key stretching to improve
         val fileOutputStream:FileOutputStream;
         try {
             fileOutputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -131,13 +134,13 @@ class HomePageActivity : AppCompatActivity() {
             val aes = ChCrypto;
             if (fileName.trim() != "") {
                 var fileInputStream: FileInputStream? = null;
-                fileInputStream = openFileInput(fileName)
-                var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream)
-                val bufferedReader: BufferedReader = BufferedReader(inputStreamReader)
-                val stringBuilder: StringBuilder = StringBuilder()
-                var text: String? = null
+                fileInputStream = openFileInput(fileName);
+                var inputStreamReader: InputStreamReader = InputStreamReader(fileInputStream);
+                val bufferedReader: BufferedReader = BufferedReader(inputStreamReader);
+                val stringBuilder: StringBuilder = StringBuilder();
+                var text: String? = null;
                 while ({ text = bufferedReader.readLine(); text }() != null) {
-                    stringBuilder.append(text)
+                    stringBuilder.append(text);
                 }
                 notes.setText(aes.aesDecrypt(stringBuilder.toString(), (keyFragment+keyFragment).substring(0, 32))).toString();
             } else {

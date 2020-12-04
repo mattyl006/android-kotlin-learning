@@ -11,6 +11,13 @@ import androidx.appcompat.app.AppCompatActivity
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.security.spec.InvalidKeySpecException
+import javax.crypto.Mac
+import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,6 +47,15 @@ class MainActivity : AppCompatActivity() {
             setFirstPass();
         }
 
+        // key-stretching test
+        val key = pbkdf2("dbsm1233211233211".toCharArray(), "23456789".toByteArray(), 1000, 32);
+        var mac = Mac.getInstance("HmacSHA1");
+        mac.init(SecretKeySpec(key, "HmacSHA1"));
+        var macResult = mac.doFinal();
+        println("TEST macResult RAW: $macResult");
+        println("TEST macResult + HASHED macREsult: " + macResult+hashString(macResult.toString()));
+        // end test
+
         var access = true;
         
         button.setOnClickListener() {
@@ -61,9 +77,9 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 Toast.makeText(
-                    this,
-                    "You must wait some time to try press password again.",
-                    Toast.LENGTH_SHORT
+                        this,
+                        "You must wait some time to try press password again.",
+                        Toast.LENGTH_SHORT
                 ).show();
                 Handler().postDelayed({
                     access = true;
@@ -97,4 +113,11 @@ class MainActivity : AppCompatActivity() {
         return stringHashed;
     }
 
+
+    @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
+    private fun pbkdf2(password: CharArray, salt: ByteArray, iterations: Int, bytes: Int): ByteArray? {
+        val spec = PBEKeySpec(password, salt, iterations, bytes * 8)
+        val skf: SecretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+        return skf.generateSecret(spec).encoded
+    }
 }
