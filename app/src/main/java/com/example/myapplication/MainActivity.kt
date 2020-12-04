@@ -14,7 +14,6 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 import javax.crypto.Mac
-import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
@@ -22,17 +21,17 @@ import javax.crypto.spec.SecretKeySpec
 class MainActivity : AppCompatActivity() {
 
     var isValid = false;
-    var typedPassword = "";
+    var password = "";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val password = findViewById<EditText>(R.id.txtPassword);
+        val typedPassword = findViewById<EditText>(R.id.txtPassword);
         val button = findViewById<Button>(R.id.btnSubmit);
 
         try {
-            typedPassword = loadPassword();
+            password = loadPassword();
         } catch (e: IOException) {
             setFirstPass();
         } catch (e: NullPointerException) {
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             setFirstPass();
         } catch (e: NumberFormatException) {
             setFirstPass();
-        }; if(typedPassword == "accident") {
+        }; if(password == "accident") {
             setFirstPass();
         }
 
@@ -54,13 +53,13 @@ class MainActivity : AppCompatActivity() {
         var macResult = mac.doFinal();
         println("TEST macResult RAW: $macResult");
         println("TEST macResult + HASHED macREsult: " + macResult+hashString(macResult.toString()));
-        // end test
+        // end testing
 
         var access = true;
         
         button.setOnClickListener() {
             if(access) {
-                val inputPassword = password.text.toString();
+                val inputPassword = typedPassword.text.toString();
                 if (inputPassword.isEmpty()) {
                     Toast.makeText(this, "You have to enter password.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -88,8 +87,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun validate(password: String) : Boolean {
-        if(hashString(password) == typedPassword) {
+    fun validate(typedPassword: String) : Boolean {
+        if(hashString(loadSalt() + typedPassword) == this.password) {
             return true;
         }
         return false;
@@ -99,6 +98,12 @@ class MainActivity : AppCompatActivity() {
         val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
         val newPassword = sharedPreference.getString("password", "accident");
         return newPassword.toString();
+    }
+
+    fun loadSalt() : String {
+        val sharedPreference = getSharedPreferences("saltStorage", Context.MODE_PRIVATE);
+        val salt = sharedPreference.getString("salt", "accident");
+        return salt.toString();
     }
 
     fun setFirstPass() {

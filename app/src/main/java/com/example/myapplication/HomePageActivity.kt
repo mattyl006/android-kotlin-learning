@@ -22,6 +22,7 @@ import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.random.Random
 
 class HomePageActivity : AppCompatActivity() {
 
@@ -178,9 +179,14 @@ class HomePageActivity : AppCompatActivity() {
 
     fun changePassword(typedPassword : String, notes : EditText, notesStorage : String) {
         try {
-            val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-            val editor = sharedPreference.edit();
-            editor.putString("password", hashString(typedPassword));
+            var sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+            var editor = sharedPreference.edit();
+            val salt = generateSalt();
+            editor.putString("password", hashString(salt + typedPassword));
+            editor.apply();
+            sharedPreference = getSharedPreferences("saltStorage", Context.MODE_PRIVATE);
+            editor = sharedPreference.edit();
+            editor.putString("salt", salt);
             editor.apply();
             loadData(notes, notesStorage);
             keyFragment = typedPassword;
@@ -202,6 +208,10 @@ class HomePageActivity : AppCompatActivity() {
             println("Something went wrong with password changing");
             Toast.makeText(this, "Something went wrong with password changing", Toast.LENGTH_LONG).show();
         }
+    }
+
+    fun generateSalt() : String {
+        return Random.nextInt(10000000, 99999999).toString();
     }
 }
 

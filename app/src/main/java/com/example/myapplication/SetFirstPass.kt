@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import java.security.MessageDigest
+import kotlin.random.Random
 
 class SetFirstPass : AppCompatActivity() {
 
@@ -24,9 +25,14 @@ class SetFirstPass : AppCompatActivity() {
             if(setPassword.text.toString().length < 16) {
                 Toast.makeText(this, "Typed password is too short, password minimal length is 16", Toast.LENGTH_LONG).show();
             } else {
-                val sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
-                val editor = sharedPreference.edit();
-                editor.putString("password", hashString(setPassword.text.toString()));
+                var sharedPreference = getSharedPreferences("passwordStorage", Context.MODE_PRIVATE);
+                var editor = sharedPreference.edit();
+                val salt = generateSalt();
+                editor.putString("password", hashString(salt + setPassword.text.toString()));
+                editor.apply();
+                sharedPreference = getSharedPreferences("saltStorage", Context.MODE_PRIVATE);
+                editor = sharedPreference.edit();
+                editor.putString("salt", salt);
                 editor.apply();
                 Toast.makeText(this, "Setting password success", Toast.LENGTH_LONG).show();
 
@@ -50,5 +56,9 @@ class SetFirstPass : AppCompatActivity() {
         messageDigest.update(stringToHash.toByteArray());
         val stringHashed = String(messageDigest.digest());
         return stringHashed;
+    }
+
+    fun generateSalt() : String {
+        return Random.nextInt(10000000, 99999999).toString();
     }
 }
