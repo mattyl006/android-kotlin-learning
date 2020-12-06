@@ -109,7 +109,7 @@ class HomePageActivity : AppCompatActivity() {
 
     fun saveData(notes: EditText, fileName: String) {
         val aes = ChCrypto;
-        val data:String = aes.aesEncrypt(notes.text.toString(), (keyFragment + keyFragment).substring(0, 32));
+        val data:String = aes.aesEncrypt(notes.text.toString(), (keyStretching(keyFragment) + keyFragment).substring(0, 32));
         // key stretching to improve
         val fileOutputStream:FileOutputStream;
         try {
@@ -144,7 +144,7 @@ class HomePageActivity : AppCompatActivity() {
                 while ({ text = bufferedReader.readLine(); text }() != null) {
                     stringBuilder.append(text);
                 }
-                notes.setText(aes.aesDecrypt(stringBuilder.toString(), (keyFragment + keyFragment).substring(0, 32))).toString();
+                notes.setText(aes.aesDecrypt(stringBuilder.toString(), (keyStretching(keyFragment) + keyFragment).substring(0, 32))).toString();
             } else {
                 Toast.makeText(this, "file name cannot be blank", Toast.LENGTH_LONG).show();
             }
