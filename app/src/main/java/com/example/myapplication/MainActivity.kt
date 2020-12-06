@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // end testing
 
         var access = true;
-        
+
         button.setOnClickListener() {
             if(access) {
                 val inputPassword = typedPassword.text.toString();
