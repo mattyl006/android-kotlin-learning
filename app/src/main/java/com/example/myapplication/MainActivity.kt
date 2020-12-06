@@ -13,10 +13,9 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
-import javax.crypto.Mac
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.SecretKeySpec
+import kotlin.experimental.and
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,12 +46,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // key-stretching test
-        val key = pbkdf2("dbsm1233211233211".toCharArray(), "23456789".toByteArray(), 1000, 32);
-        var mac = Mac.getInstance("HmacSHA1");
-        mac.init(SecretKeySpec(key, "HmacSHA1"));
-        var macResult = mac.doFinal();
-        println("TEST macResult RAW: $macResult");
-        println("TEST macResult + HASHED macREsult: " + macResult+hashString(macResult.toString()));
+//        println("TEST_1: " + keyStretching("pass123321123321"));
+//        println("TEST_2: " + keyStretching("pass123321123321"));
+//        println("TEST_3: " + keyStretchingFailed("pass123321123321".toCharArray(), "1000".toByteArray()));
+//        println("TEST_4: " + keyStretchingFailed("pass123321123321".toCharArray(), "1000".toByteArray()));
         // end testing
 
         var access = true;
@@ -118,11 +115,27 @@ class MainActivity : AppCompatActivity() {
         return stringHashed;
     }
 
+    @Throws(InvalidKeySpecException::class) // failed because return different output for the same inputs
+    private fun keyStretchingFailed(password: CharArray, salt: ByteArray): ByteArray {
+        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        val spec = PBEKeySpec(password, salt, 1000, 32);
+        return skf.generateSecret(spec).encoded;
+    }
 
-    @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
-    private fun pbkdf2(password: CharArray, salt: ByteArray, iterations: Int, bytes: Int): ByteArray? {
-        val spec = PBEKeySpec(password, salt, iterations, bytes * 8)
-        val skf: SecretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-        return skf.generateSecret(spec).encoded
+    fun keyStretching(passwordToHash: String): String {
+        var generatedPassword: String? = null
+        try {
+            val md = MessageDigest.getInstance("MD5")
+            md.update(passwordToHash.toByteArray())
+            val bytes = md.digest()
+            val sb = StringBuilder()
+            for (i in bytes.indices) {
+                sb.append(((bytes[i] and 0xff.toByte()) + 0x100).toString(16).substring(1))
+            }
+            generatedPassword = sb.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        }
+        return generatedPassword.toString();
     }
 }
