@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import java.io.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -121,7 +122,7 @@ class HomePageActivity : AppCompatActivity() {
         })
     }
 
-    fun saveData(notes: EditText, fileName: String) {
+    private fun saveData(notes: EditText, fileName: String) {
         val aes = ChCrypto;
         val ivValue = generateIvValue();
         saveIvValue(encryptECB(ivValue, keyStretching(keyFragment, loadSalt())));
@@ -151,7 +152,7 @@ class HomePageActivity : AppCompatActivity() {
         }
     }
 
-    fun loadData(notes: EditText, fileName: String) {
+    private fun loadData(notes: EditText, fileName: String) {
         try {
             val aes = ChCrypto;
             if (fileName.trim() != "") {
@@ -258,7 +259,11 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     private fun generateSalt() : String {
-        return Random.nextInt(10000000, 99999999).toString();
+        val sr = SecureRandom();
+        val salt = ByteArray(6);
+        sr.nextBytes(salt);
+        val result = Base64.getEncoder().encodeToString(salt);
+        return result;
     }
 
     fun loadSalt() : String {
@@ -268,7 +273,11 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     private fun generateIvValue() : String {
-        return Random.nextLong(1000000000000000, 9999999999999999).toString();
+        val sr = SecureRandom();
+        val salt = ByteArray(10);
+        sr.nextBytes(salt);
+        val result = Base64.getEncoder().encodeToString(salt);
+        return result;
     }
 
     private fun loadIvValue() : String {

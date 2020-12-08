@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.*
 import kotlin.random.Random
 
 class SetFirstPass : AppCompatActivity() {
@@ -58,7 +60,11 @@ class SetFirstPass : AppCompatActivity() {
         return stringHashed;
     }
 
-    fun generateSalt() : String {
-        return Random.nextInt(10000000, 99999999).toString();
+    private fun generateSalt() : String {
+        val sr = SecureRandom();
+        val salt = ByteArray(6);
+        sr.nextBytes(salt);
+        val result = Base64.getEncoder().encodeToString(salt);
+        return result;
     }
 }

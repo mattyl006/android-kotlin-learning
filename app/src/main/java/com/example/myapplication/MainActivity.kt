@@ -12,7 +12,9 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
 import java.security.spec.InvalidKeySpecException
+import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import kotlin.experimental.and
@@ -46,12 +48,8 @@ class MainActivity : AppCompatActivity() {
             setFirstPass();
         }
 
-        // key-stretching test
-        println("TEST_1: " + keyStretching("pass123321123321", "10001000"));
-        println("TEST_2: " + keyStretching("pass123321123321", "10001000"));
-//        println("TEST_3: " + keyStretchingFailed("pass123321123321", "10001000", 10000, 16));
-//        println("TEST_4: " + keyStretchingFailed("pass123321123321", "10001000", 10000, 16));
-        // end testing
+        // generate iv test
+        println("TEST_iv: " + generateIvValue());
 
         var access = true;
 
@@ -98,6 +96,14 @@ class MainActivity : AppCompatActivity() {
         return newPassword.toString();
     }
 
+    private fun generateIvValue() : String {
+        val sr = SecureRandom();
+        val salt = ByteArray(10);
+        sr.nextBytes(salt);
+        val result = Base64.getEncoder().encodeToString(salt);
+        return result;
+    }
+
     fun loadSalt() : String {
         val sharedPreference = getSharedPreferences("saltStorage", Context.MODE_PRIVATE);
         val salt = sharedPreference.getString("salt", "accident");
@@ -114,13 +120,6 @@ class MainActivity : AppCompatActivity() {
         messageDigest.update(stringToHash.toByteArray());
         val stringHashed = String(messageDigest.digest());
         return stringHashed;
-    }
-
-    fun keyStretching(password: String,  salt: String): String {
-        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        val spec = PBEKeySpec(password.toCharArray(), salt.toByteArray(), 10000, 24*8);
-        val key =  skf.generateSecret(spec);
-        return key.encoded.toHex();
     }
 
     private fun ByteArray.toHex(): String {
