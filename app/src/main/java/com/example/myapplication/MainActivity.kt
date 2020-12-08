@@ -48,8 +48,8 @@ class MainActivity : AppCompatActivity() {
         // key-stretching test
 //        println("TEST_1: " + keyStretching("pass123321123321"));
 //        println("TEST_2: " + keyStretching("pass123321123321"));
-//        println("TEST_3: " + keyStretchingFailed("pass123321123321".toCharArray(), "1000".toByteArray()));
-//        println("TEST_4: " + keyStretchingFailed("pass123321123321".toCharArray(), "1000".toByteArray()));
+        println("TEST_3: " + keyStretchingFailed().toString());
+        println("TEST_4: " + keyStretchingFailed().toString());
         // end testing
 
         var access = true;
@@ -116,25 +116,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Throws(InvalidKeySpecException::class) // failed because return different output for the same inputs
-    private fun keyStretchingFailed(password: CharArray, salt: ByteArray): ByteArray {
+    private fun keyStretchingFailed(): ByteArray {
+        val password = "pass123321123321".toCharArray();
+        val salt = "1000".toByteArray();
         val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         val spec = PBEKeySpec(password, salt, 1000, 32);
-        return skf.generateSecret(spec).encoded;
+        val result = skf.generateSecret(spec).encoded;
+        return result;
     }
 
     fun keyStretching(passwordToHash: String): String {
-        var generatedPassword: String? = null
+        var generatedPassword: String? = null;
         try {
-            val md = MessageDigest.getInstance("MD5")
-            md.update(passwordToHash.toByteArray())
-            val bytes = md.digest()
-            val sb = StringBuilder()
+            val md = MessageDigest.getInstance("MD5");
+            md.update(passwordToHash.toByteArray());
+            val bytes = md.digest();
+            val sb = StringBuilder();
             for (i in bytes.indices) {
-                sb.append(((bytes[i] and 0xff.toByte()) + 0x100).toString(16).substring(1))
+                sb.append(((bytes[i] and 0xff.toByte()) + 0x100).toString(16).substring(1));
             }
-            generatedPassword = sb.toString()
+            generatedPassword = sb.toString();
         } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
+            e.printStackTrace();
         }
         return generatedPassword.toString();
     }
