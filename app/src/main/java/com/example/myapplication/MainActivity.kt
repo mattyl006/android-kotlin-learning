@@ -17,6 +17,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import kotlin.experimental.and
 
+
 class MainActivity : AppCompatActivity() {
 
     var isValid = false;
@@ -46,10 +47,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // key-stretching test
-//        println("TEST_1: " + keyStretching("pass123321123321"));
-//        println("TEST_2: " + keyStretching("pass123321123321"));
-        println("TEST_3: " + keyStretchingFailed().toString());
-        println("TEST_4: " + keyStretchingFailed().toString());
+        println("TEST_1: " + keyStretching("pass123321123321", "10001000"));
+        println("TEST_2: " + keyStretching("pass123321123321", "10001000"));
+//        println("TEST_3: " + keyStretchingFailed("pass123321123321", "10001000", 10000, 16));
+//        println("TEST_4: " + keyStretchingFailed("pass123321123321", "10001000", 10000, 16));
         // end testing
 
         var access = true;
@@ -115,30 +116,14 @@ class MainActivity : AppCompatActivity() {
         return stringHashed;
     }
 
-    @Throws(InvalidKeySpecException::class) // failed because return different output for the same inputs
-    private fun keyStretchingFailed(): ByteArray {
-        val password = "pass123321123321".toCharArray();
-        val salt = "1000".toByteArray();
-        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        val spec = PBEKeySpec(password, salt, 1000, 32);
-        val result = skf.generateSecret(spec).encoded;
-        return result;
+    fun keyStretching(password: String,  salt: String): String {
+        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+        val spec = PBEKeySpec(password.toCharArray(), salt.toByteArray(), 10000, 24*8);
+        val key =  skf.generateSecret(spec);
+        return key.encoded.toHex();
     }
 
-    fun keyStretching(passwordToHash: String): String {
-        var generatedPassword: String? = null;
-        try {
-            val md = MessageDigest.getInstance("MD5");
-            md.update(passwordToHash.toByteArray());
-            val bytes = md.digest();
-            val sb = StringBuilder();
-            for (i in bytes.indices) {
-                sb.append(((bytes[i] and 0xff.toByte()) + 0x100).toString(16).substring(1));
-            }
-            generatedPassword = sb.toString();
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace();
-        }
-        return generatedPassword.toString();
+    private fun ByteArray.toHex(): String {
+        return joinToString("") { "%02x".format(it) }
     }
 }

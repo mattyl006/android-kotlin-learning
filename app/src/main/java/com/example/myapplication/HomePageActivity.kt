@@ -16,12 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import java.io.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.*
 import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-import kotlin.experimental.and
 import kotlin.random.Random
+import java.util.Base64;
 
 
 class HomePageActivity : AppCompatActivity() {
@@ -123,10 +124,10 @@ class HomePageActivity : AppCompatActivity() {
     fun saveData(notes: EditText, fileName: String) {
         val aes = ChCrypto;
         val ivValue = generateIvValue();
-        saveIvValue(encryptECB(ivValue, keyStretching(keyFragment) + keyFragment));
+        saveIvValue(encryptECB(ivValue, keyStretching(keyFragment, loadSalt())));
         val data:String = aes.aesEncrypt(
             notes.text.toString(),
-            (keyStretching(keyFragment) + keyFragment).substring(0, 32),
+            (keyStretching(keyFragment,  loadSalt())).substring(0, 32),
             ivValue
         );
         // key stretching to improve
@@ -166,10 +167,10 @@ class HomePageActivity : AppCompatActivity() {
                 notes.setText(
                     aes.aesDecrypt(
                         stringBuilder.toString(),
-                        (keyStretching(keyFragment) + keyFragment).substring(0, 32),
-                        decryptECB(loadIvValue(), keyStretching(keyFragment) + keyFragment)
+                        (keyStretching(keyFragment, loadSalt())).substring(0, 32),
+                        decryptECB(loadIvValue(), keyStretching(keyFragment, loadSalt())
                     )
-                ).toString();
+                ));
             } else {
                 Toast.makeText(this, "file name cannot be blank", Toast.LENGTH_LONG).show();
             }
@@ -260,6 +261,12 @@ class HomePageActivity : AppCompatActivity() {
         return Random.nextInt(10000000, 99999999).toString();
     }
 
+    fun loadSalt() : String {
+        val sharedPreference = getSharedPreferences("saltStorage", Context.MODE_PRIVATE);
+        val salt = sharedPreference.getString("salt", "accident");
+        return salt.toString();
+    }
+
     private fun generateIvValue() : String {
         return Random.nextLong(1000000000000000, 9999999999999999).toString();
     }
@@ -278,21 +285,15 @@ class HomePageActivity : AppCompatActivity() {
         editor.apply();
     }
 
-    private fun keyStretching(passwordToHash: String): String {
-        var generatedPassword: String? = null
-        try {
-            val md = MessageDigest.getInstance("MD5")
-            md.update(passwordToHash.toByteArray())
-            val bytes = md.digest()
-            val sb = StringBuilder()
-            for (i in bytes.indices) {
-                sb.append(((bytes[i] and 0xff.toByte()) + 0x100).toString(16).substring(1))
-            }
-            generatedPassword = sb.toString()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        }
-        return generatedPassword.toString();
+    fun keyStretching(password: String,  salt: String): String {
+        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+        val spec = PBEKeySpec(password.toCharArray(), salt.toByteArray(), 10000, 24*8);
+        val key =  skf.generateSecret(spec);
+        return key.encoded.toHex();
+    }
+
+    private fun ByteArray.toHex(): String {
+        return joinToString("") { "%02x".format(it) }
     }
 
     fun setKey(myKey: String): SecretKeySpec? {
